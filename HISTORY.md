@@ -92,3 +92,17 @@ All major modifications, architectural milestones, commits, and engineering acti
   - Clean C++20 compilation of `kfighter_core.lib`, `test_collision.exe`, `test_physics.exe`, and `kfighter_desktop.exe`.
 - **Rationale**: Fulfills Phase 1 (Option A), giving KFighter a verified, standalone, portable C++ engine ready for Android packaging in Phase 2.
 
+---
+
+### [2026-09-20 13:28:30 +05:30] - Security Audit & Legacy Binary Purge
+- **Action**: Performed a comprehensive security audit following a Windows Defender alert.
+- **Root Cause Identified**:
+  - The alert was triggered by `openlf2.exe` (SHA256: `254ABEF7302542A2AF7C3E3F36D3E58A72C1116BDEEE3D33E66AE10F9F054C39`), a legacy 32-bit PE binary from the upstream clone `xsoameix/openlf2`.
+  - Windows Defender flagged it as `Trojan:Win32/Wacatac.H!ml` due to stripped metadata, hardcoded ad URLs, and modified PE import tables designed for DLL injection.
+- **Remediation**:
+  - Quarantined and permanently deleted `openlf2.exe` and `openlf2.exe.txt` from the filesystem and Git repository.
+  - Audited all source files across `engine/`, `desktop/`, `tests/`, `include/`, and `src/` for suspicious network APIs (`socket`, `connect`, `InternetOpen`, `WinHttp`, `curl`), registry modifications, or process spawning. Found **zero** telemetry, **zero** exfiltration scripts, and **zero** network activity.
+  - Executed Windows Defender scans across `engine/`, `desktop/`, `tests/`, `include/`, and `src/`: all directories returned **0 threats**.
+- **Rationale**: Ensure 100% repository safety, remove unneeded legacy binaries, and guarantee safe development for Android.
+
+
