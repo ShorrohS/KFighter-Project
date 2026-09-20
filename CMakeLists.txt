@@ -1,26 +1,34 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.20)
+project(kfighter VERSION 1.0.0 LANGUAGES C CXX)
 
-set(PROJECT openlf2)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-SET(CMAKE_SYSTEM_NAME Windows)
-set(COMPILER_PREFIX i686-w64-mingw32)
-set(CMAKE_C_COMPILER /usr/bin/${COMPILER_PREFIX}-gcc)
-set(CMAKE_C_FLAGS "-B /usr/${COMPILER_PREFIX} -B . -std=gnu11")
+include(FetchContent)
 
-# here is the target environment located
-set(CMAKE_FIND_ROOT_PATH ${COMPILER_PREFIX})
+# Enable unit testing
+enable_testing()
 
-# adjust the default behaviour of the FIND_XXX() commands:
-# search headers and libraries in the target environment, search 
-# programs in the host environment
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+# Core engine static library
+add_subdirectory(engine)
 
-file(GLOB_RECURSE OPENLF2_SOURCES "src/*.c")
-add_library(${PROJECT} SHARED ${OPENLF2_SOURCES})
+# Automated unit tests
+add_subdirectory(tests)
 
-# libopenlf2.so -> openlf2.dll
-set_target_properties(${PROJECT} PROPERTIES
-    PREFIX ""
-    SUFFIX ".dll")
+# Fetch SDL2 for Desktop Interactive Test Harness
+message(STATUS "Fetching SDL2 (release-2.30.2)...")
+FetchContent_Declare(
+    SDL2
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+    GIT_TAG        release-2.30.2
+    GIT_SHALLOW    TRUE
+)
+
+set(SDL_SHARED ON CACHE BOOL "Build SDL shared library" FORCE)
+set(SDL_STATIC OFF CACHE BOOL "Build SDL static library" FORCE)
+set(SDL_TEST OFF CACHE BOOL "Build SDL test targets" FORCE)
+
+FetchContent_MakeAvailable(SDL2)
+
+# Desktop interactive test harness
+add_subdirectory(desktop)

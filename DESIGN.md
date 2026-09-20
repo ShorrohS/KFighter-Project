@@ -185,13 +185,22 @@ gantt
     APK Release & Optimization                  : 2026-11-14, 7d
 ```
 
-- **Phase 1: Architecture & Standalone Engine Foundation**
-  - Translate reverse-engineered C data structures (`object_t`, `frame_t`, `itr_t`, `bdy_t`) into portable, clean C++ classes without Windows API dependencies.
-  - Implement the core 2.5D physics simulation, collision detection, and deterministic tick loop.
-- **Phase 2: Android Porting & Rendering Pipeline**
-  - Configure Android NDK / CMake build harness.
-  - Integrate SDL2 / OpenGL ES 3.0 sprite renderer with shader pipelines.
-  - Implement on-screen touch controller with multi-touch support and haptic feedback.
+- **Phase 1: Architecture & Standalone Engine Foundation (COMPLETED)**
+  - Translated reverse-engineered C data structures into modern C++20 domain headers:
+    - [`types.hpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/engine/include/kfighter/types.hpp): `Vec3f`, `Vec2i`, `Facing`, `Team`, `EntityType`.
+    - [`hitbox.hpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/engine/include/kfighter/hitbox.hpp): `Hitbox` (`itr`), `Hurtbox` (`bdy`), `WorldBox` with 2.5D depth intersection.
+    - [`frame.hpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/engine/include/kfighter/frame.hpp): `Frame`, input branching triggers (`hit_a`, `hit_j`, `hit_d`), anchors (`opoint`, `bpoint`, `wpoint`).
+    - [`entity.hpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/engine/include/kfighter/entity.hpp): `Entity` state machine, 2.5D position/velocity, HP/MP, timers, and default fighter frames.
+    - [`collision.hpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/engine/include/kfighter/collision.hpp) & [`collision.cpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/engine/src/collision.cpp): Full implementation of `func_417400_does_attack_success` (depth filtering, friendly fire, invulnerability, guard damage reduction).
+    - [`world.hpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/engine/include/kfighter/world.hpp) & [`world.cpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/engine/src/world.cpp): Fixed-timestep simulation tick loop, arena boundary clamping, pairwise combat resolution, and event logging.
+  - Implemented and passed 100% of automated unit test suites:
+    - [`test_collision.cpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/tests/src/test_collision.cpp): 5 tests covering 2.5D depth filtering, friendly fire immunity, invulnerability frames, damage/knockback calculation, and directional guard mechanics.
+    - [`test_physics.cpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/tests/src/test_physics.cpp): 3 tests covering gravity, ground landing at `y=0`, friction deceleration, and arena wall clamping.
+  - Built interactive desktop test harness with SDL2 ([`main.cpp`](file:///c:/Users/ssro2/Desktop/Projects/Android/LF2/desktop/src/main.cpp)) rendering 2.5D perspective grid, depth shadows, color-coded hurtboxes/hitboxes, impact sparks, and dual HP HUD.
+- **Phase 2: Android Porting & Rendering Pipeline (NEXT)**
+  - Configure Android NDK / CMake build harness with Android Studio / Gradle.
+  - Integrate SDL2 Android `NativeActivity` glue and EGL/OpenGL ES 3.0 renderer.
+  - Implement on-screen touch controller with multi-touch virtual D-Pad and action buttons (A, J, D).
 - **Phase 3: Kerala Theme Integration**
   - Implement Kerala character data definitions, sprite sheets, and animations.
   - Build Kerala stages with parallax scrolling backgrounds.
